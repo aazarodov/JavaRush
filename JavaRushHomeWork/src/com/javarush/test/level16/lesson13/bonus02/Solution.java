@@ -17,7 +17,7 @@ import java.util.List;
 
 public class Solution {
     public static List<Thread> threads = new ArrayList<Thread>(5);
-
+    // test
     static {
         threads.add(new Thread1());
         threads.add(new Thread2());
