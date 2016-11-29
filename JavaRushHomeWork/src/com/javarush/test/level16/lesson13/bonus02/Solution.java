@@ -1,5 +1,8 @@
 package com.javarush.test.level16.lesson13.bonus02;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -17,7 +20,7 @@ import java.util.List;
 
 public class Solution {
     public static List<Thread> threads = new ArrayList<Thread>(5);
-    // test
+
     static {
         threads.add(new Thread1());
         threads.add(new Thread2());
@@ -26,9 +29,27 @@ public class Solution {
         threads.add(new Thread5());
     }
 
+    private static void sleep()
+    {
+        try {
+            Thread.sleep(100);
+        }
+        catch (InterruptedException e) {
+        }
+    }
+
     public static void main(String[] args) {
-        for (Thread t : threads)
-            t.start();
+        Thread thread2 = threads.get(1);
+        thread2.start();
+        sleep();
+        thread2.interrupt();
+
+        Thread thread4 = threads.get(3);
+        Message message = (Message) thread4;
+        thread4.start();
+        sleep();
+        message.showWarning();
+        System.out.println(thread4.isAlive());
     }
 
     public static class Thread1 extends Thread {
@@ -54,8 +75,8 @@ public class Solution {
         public void run() {
             try {
                 while (true) {
-                    Thread.sleep(500);
                     System.out.println("Ура");
+                    Thread.sleep(500);
                 }
             } catch (InterruptedException e){}
         }
@@ -63,15 +84,38 @@ public class Solution {
 
     public static class Thread4 extends Thread implements Message {
         public void run() {
-            while (isAlive()) {}
+            Thread current = Thread.currentThread();
+            while (!isInterrupted()) {}
         }
         @Override
         public void showWarning() {
             interrupt();
+            try {
+                join();
+            }
+            catch(Exception e) {}
         }
     }
 
     public static class Thread5 extends Thread {
-
+        public void run() {
+            String s = "";
+            int sum = 0;
+            BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
+            try {
+                while (!isInterrupted()) {
+                    s = reader.readLine();
+                    if (s.equals("N"))
+                        interrupt();
+                    else {
+                        sum = sum + Integer.parseInt(s);
+                    }
+                }
+                reader.close();
+                System.out.println(sum);
+            } catch (IOException e) {
+                System.out.println(sum);
+            }
+        }
     }
 }
