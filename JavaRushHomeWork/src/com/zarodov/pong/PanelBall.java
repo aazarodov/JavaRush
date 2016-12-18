@@ -8,7 +8,7 @@ import java.awt.event.KeyEvent;
  * Created by zarodov on 16.12.2016.
  */
 public class PanelBall extends JPanel implements Runnable {
-    private int ballX = 10, ballY = 100, racket1X = 10, racket1Y = 100, racket2X = 230, racket2Y = 100;
+    private int ballX = 100, ballY = 100, racket1X = 10, racket1Y = 100, racket2X = 230, racket2Y = 100;
     Thread thread;
     int right = 5;
     int left = -5;
@@ -20,9 +20,7 @@ public class PanelBall extends JPanel implements Runnable {
     boolean gamming, gameOver;
 
     public PanelBall() {
-        gamming = true;
-        thread = new Thread(this);
-        thread.start();
+
     }
 
     public void paintComponent(Graphics gc) {
@@ -30,7 +28,8 @@ public class PanelBall extends JPanel implements Runnable {
         super.paintComponent(gc);
 
         gc.setColor(Color.BLACK);
-        gc.fillOval(ballX, ballY, 8, 8);
+        if (gamming)
+            gc.fillOval(ballX, ballY, 8, 8);
         gc.fillRect(racket1X, racket1Y, 10, 25);
         gc.fillRect(racket2X, racket2Y, 10, 25);
         gc.drawString("Player 1: " + pointPlay1, 25, 10);
@@ -50,6 +49,8 @@ public class PanelBall extends JPanel implements Runnable {
 
     public void keyPressed(KeyEvent evt) {
         switch (evt.getKeyCode()) {
+            case KeyEvent.VK_ENTER :
+                startGame(); break;
             case KeyEvent.VK_W :
                 player1FlagUp = true; break;
             case KeyEvent.VK_S :
@@ -102,6 +103,16 @@ public class PanelBall extends JPanel implements Runnable {
         repaint();
     }
 
+    public void startGame() {
+        gamming = true;
+        thread = new Thread(this);
+
+        ballX = ((this.getWidth() / 2) / 5) * 5;
+        ballY = ((this.getHeight() / 2) / 5) * 5;
+        drawBall(ballX, ballY);
+        thread.start();
+    }
+
     public void run() {
         boolean leftRight = false;
         boolean upDown = false;
@@ -147,7 +158,7 @@ public class PanelBall extends JPanel implements Runnable {
                 }
 
                 if (ballX == racket1X + 10 && ballY >= racket1Y && ballY <= (racket1Y + 25))
-                    leftRight = false;
+                    leftRight = true;
 
                 if (ballX == (racket2X - 5) && ballY >= racket2Y && ballY <= (racket2Y + 25))
                     leftRight = false;
